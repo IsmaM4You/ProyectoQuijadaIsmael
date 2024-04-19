@@ -9,33 +9,25 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    // AuthController.php
-
-public function login(Request $request)
-{
-    $loginData = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required'
-    ]);
-
-    // Verifica las credenciales
-    if (Auth::attempt($loginData)) {
-        // Si las credenciales son válidas, genera el token de acceso
-        $accessToken = auth()->user()->createToken('authToken')->accessToken;
-
-        // Retorna la respuesta con el usuario autenticado y el token de acceso
-        return response()->json([
-            'user' => auth()->user(),
-            'access_token' => $accessToken
+    public function login(Request $request)
+    {
+        $loginData = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
         ]);
-    } else {
-        // Si las credenciales no son válidas, devuelve un mensaje de error
-        return response()->json([
-            'message' => 'Credenciales inválidas'
-        ], 401);
-    }
-}
 
+        if (Auth::attempt($loginData)) {
+            $accessToken = auth()->user()->createToken('authToken')->accessToken;
+            return response()->json([
+                'user' => auth()->user(),
+                'access_token' => $accessToken
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Credenciales invalidas'
+            ], 401);
+        }
+    }
 
     public function register(Request $request)
     {

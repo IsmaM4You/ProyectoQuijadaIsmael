@@ -49,40 +49,46 @@ class UsersController extends Controller
         }
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $perfilId)
     {
-        $data = $request->validate([
-            'id' => 'required|integer|min:1',
-            'name' => 'required',
-            'email' => 'required',
-            'password' => 'required|min:6'
-        ]);
+        try {
+            $perfil = User::findOrFail($perfilId);
 
-        $user = User::where('id', '=', $data['id'])->first();
+            $validatedData = $request->validate([
+                'name' => 'nullable|max:55',
+                'email' => 'nullable',
 
-        if ($user) {
-            $old_data = $user->replicated();
+            ]);
 
-            $user->name = $data['name'];
-            $user->email = $data['email'];
-            $user->password = bcrypt($data['password']);
-            if ($user->save()) {
-                $object = [
-                    'response' => 'success',
-                    "old" => $old_data,
-                    "new" => $user
-                ];
-                return response()->json($object);
-            } else {
-                $object = [
-                    "response" => "Error"
-                ];
-                return response()->json($object, 500);
+            $updated = false;
+
+            if ($request->filled('name')) {
+                $perfil->name = $validatedData['name'];
+                $updated = true;
             }
-        } else {
-            return response()->json(['error' => 'User not found.'], 404);
+
+            if ($request->filled('email')) {
+                $perfil->email = $validatedData['email'];
+                $updated = true;
+            }
+
+
+
+            if ($updated) {
+                $perfil->save();
+            }
+
+            return response()->json([
+                'message' => $updated ? 'Perfil actualizado correctamente' : 'No se realizaron cambios',
+                'profile' => $perfil,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Se produjo un error al procesar la solicitud: ' . $e->getMessage(),
+            ], 500);
         }
     }
+    
 
     public function destroy($id)
     {

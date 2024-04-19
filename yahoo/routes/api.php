@@ -9,6 +9,11 @@ use App\Http\Controllers\Api\QuestionsController;
 use App\Http\Controllers\Api\AnswersController;
 use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\AuthController;
+use Laravel\Passport\Passport;
+
+Route::prefix('auth')->group(function () {
+    Passport::routes();
+});
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -47,7 +52,7 @@ Route::get('/answers/question/{question_id}', [AnswersController::class, 'getByQ
 Route::get('/users', [UsersController::class, 'index']); 
 Route::get('/users/{id}', [UsersController::class, 'show']); 
 Route::post('/users', [UsersController::class, 'store']); 
-Route::post('/users/update', [UsersController::class, 'update']); 
+Route::post('/users/update/{id}', [UsersController::class, 'update']);
 Route::delete('/users/{id}', [UsersController::class, 'destroy']); 
 Route::get('/users/search/{name}', [UsersController::class, 'getUsers']); 
 
